@@ -1,13 +1,14 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
 
+from . import s3_bucket
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
 
 # Dependency
 def get_db():
@@ -40,3 +41,12 @@ def login(login_request: schemas.UserCreate, db: Session = Depends(get_db)):
     if result is False:
         raise HTTPException(status_code=404, detail="User not found")
     return result
+
+@app.post("/users/pictures")
+async def upload_picture(file: UploadFile):
+    s3_bucket.s3.put_object(
+        Body = await file.read(),
+        Bucket = f'{s3_bucket.bucket_name}',
+        Key = f'{file.filename}',
+        ContentType = 'image/jpeg'
+    )
