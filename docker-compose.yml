@@ -14,10 +14,10 @@ services:
 
   web:
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 5123
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     volumes:
       - .:/code
     ports:
-      - "5123:5123"
+      - "8000:8000"
     depends_on:
       - db
