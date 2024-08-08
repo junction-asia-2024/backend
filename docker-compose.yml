@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.4
+    restart: always
+    environment:
+      # MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: junction
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: junction123!
+    ports:
+      - "3306:3306"
+
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 5123
+    volumes:
+      - .:/code
+    ports:
+      - "5123:5123"
+    depends_on:
+      - db
