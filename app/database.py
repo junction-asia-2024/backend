@@ -1,10 +1,15 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:junction123!@db:3306/junction"
-# SQLALCHEMY_DATABASE_URL = "mariadb+pymysql://root:d4594283!@localhost:3306/junction"
+from dotenv import load_dotenv
 
+load_dotenv()
+
+database_url = os.getenv('DATABASE_URL')
+
+SQLALCHEMY_DATABASE_URL = database_url
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
