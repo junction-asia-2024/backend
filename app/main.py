@@ -25,7 +25,7 @@ def get_db():
 def read_root(db: Session = Depends(get_db)):
     file = open('/code/app/insert.txt', 'r')
     query = file.read()
-    db.execute(text(query))
+    db.execute(Text(query))
     db.commit()
     return {"Hello": "World"}
 
