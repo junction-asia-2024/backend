@@ -50,3 +50,10 @@ class NearByComplaint(BaseModel):
 
     class Config:
         from_attributes = True
+
+class OptionalDescription(BaseModel):
+    phone: str
+    description: str
+
+    class Config:
+        from_attributes = True

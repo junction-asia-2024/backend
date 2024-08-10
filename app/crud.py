@@ -60,7 +60,7 @@ def get_nearby_complaint(db: Session):
             latitude=result.latitude,
             time=result.time,
             address=result.address,
-            file_url=f"{s3_bucket.bucket_url_prefix}/pre-images/00000{result.id}"
+            file_url=f"{s3_bucket.bucket_url_prefix}pre-images/00000{result.id}"
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
@@ -178,6 +178,15 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
 
     return formatted_result
 
+def update_complaints(db: Session, id: int, complaint: schemas.OptionalDescription):
+    result = get_complaint(id, db)
+
+    result.phone = complaint.phone
+    result.description = complaint.description
+
+    db.commit()
+    db.refresh(result)
+    return result
 
 class NearByComplaintResponse():
     def __init__(self, id, longitude, latitude, time, address, file_url):
