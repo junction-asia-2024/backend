@@ -2,28 +2,46 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .utils import Hasher
+from datetime import date
 
 
-def get_user(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+# def get_user(db: Session, email: str):
+#     return db.query(models.User).filter(models.User.email == email).first()
+#
+#
+# def get_user_by_email(db: Session, email: str):
+#     return db.query(models.User).filter(models.User.email == email).first()
 
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
-
-
-def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(email=user.email, password=Hasher.get_password_hash(user.password))
-    db.add(db_user)
+def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
+    complaint = models.Complaint(
+        location=complaint.location,
+        latitude=complaint.latitude,
+        longitude=complaint.longitude,
+        type=complaint.type.value,
+        phone=complaint.phone,
+        image_link=complaint.image_link,
+        status=complaint.status.value,
+        description=complaint.description,
+        created_at=date.today()
+    )
+    db.add(complaint)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(complaint)
+
+    return complaint
 
 
-def login(db: Session, login_request: schemas.UserCreate):
-    user = get_user(db, login_request.email)
-    if user is None:
-        return False
-    if Hasher.verify_password(login_request.password, user.password) is False:
-        return False
-    return user
+def get_complaints(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Complaint).offset(skip).limit(limit).all()
+
+
+def get_complaint(complaint_id: int, db: Session):
+    return db.query(models.Complaint).filter(models.Complaint.id == complaint_id).first()
+
+
+def delete_complaint(complaint_id: int, db: Session):
+    complaint = db.query(models.Complaint).filter(models.Complaint.id == complaint_id).first()
+    db.delete(complaint)
+    db.commit()
+    return complaint

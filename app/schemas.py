@@ -1,15 +1,42 @@
 from pydantic import BaseModel
+import datetime
 
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
+from app.enums import TYPE, STATUS
 
 
-class User(UserBase):
-    id: int
+# class ComplaintBase(BaseModel):
+#     location: str
+#     type: TYPE
+#     phone: str
+#     image_link: str
+#     status: STATUS
+#     created_at: datetime.date
+#
+#
+# class ComplaintCreate(ComplaintBase):
+#     location: str
+#     type: TYPE
+#     phone: str
+#     image_link: str
+#     status: STATUS
+#     created_at: datetime.date
+class ComplaintCreate(BaseModel):
+    location: str
+    latitude: float
+    longitude: float
+    type: TYPE
+    phone: str
+    image_link: str
+    status: STATUS
+    description: str
+
+    class Config:
+        orm_mode = True
+
+
+class ComplaintGet(ComplaintCreate):
+    id: int  # ID 필드를 추가합니다.
+    created_at: datetime.date
 
     class Config:
         orm_mode = True

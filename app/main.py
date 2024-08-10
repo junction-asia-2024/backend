@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
+from fastapi import Depends, FastAPI, UploadFile, File
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
@@ -10,6 +10,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -19,34 +20,40 @@ def get_db():
         db.close()
 
 
-@app.post("/users", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+@app.get("/")
+def hc():
+    return 'success'
 
 
-@app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, email=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+# 민원 등록
+@app.post("/api/complaints", response_model=schemas.ComplaintGet)
+def create_complaint(complaint: schemas.ComplaintCreate, db: Session = Depends(get_db)):
+    return crud.create_complaint(db=db, complaint=complaint)
 
 
-@app.post("/users/login", response_model=schemas.User)
-def login(login_request: schemas.UserCreate, db: Session = Depends(get_db)):
-    result = crud.login(db, login_request)
-    if result is False:
-        raise HTTPException(status_code=404, detail="User not found")
-    return result
+# 민원 목록 조회
+@app.get("/api/complaints", response_model=list[schemas.ComplaintGet])
+def get_complaints(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+    return crud.get_complaints(db, skip=skip, limit=limit)
 
-@app.post("/users/pictures")
+
+# 민원 단건 조회
+@app.get("/api/complaints/{complaint_id}", response_model=schemas.ComplaintGet)
+def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
+    return crud.get_complaint(complaint_id, db)
+
+
+# 민원 삭제
+@app.delete("/api/complaints/{complaint_id}", response_model=schemas.ComplaintGet)
+def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
+    return crud.delete_complaint(complaint_id, db)
+
+
+@app.post("/api/users/pictures")
 async def upload_picture(file: UploadFile):
     s3_bucket.s3.put_object(
-        Body = await file.read(),
-        Bucket = f'{s3_bucket.bucket_name}',
-        Key = f'{file.filename}',
-        ContentType = 'image/jpeg'
+        Body=await file.read(),
+        Bucket=f'{s3_bucket.bucket_name}',
+        Key=f'{file.filename}',
+        ContentType='image/jpeg'
     )
