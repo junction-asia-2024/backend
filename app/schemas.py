@@ -25,10 +25,8 @@ class ComplaintCreate(BaseModel):
     latitude: str
     longitude: str
     classname: CLASSNAME
-    phone: str
     image_link: str
     status: STATUS
-    description: str
 
     class Config:
         from_attributes = True

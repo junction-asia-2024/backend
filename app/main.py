@@ -61,8 +61,6 @@ def create_complaint(
     latitude: Annotated[str, Form()],
     longitude: Annotated[str, Form()],
     classname: Annotated[str, Form()],
-    phone: Annotated[str, Form()],
-    description: Annotated[str, Form()],
     db: Session = Depends(get_db)
 ):
     complaint = schemas.ComplaintCreate(
@@ -70,10 +68,8 @@ def create_complaint(
         latitude=latitude,
         longitude=longitude,
         classname=classname,
-        phone=phone,
         image_link=file,
         status="W",
-        description=description
     )
     
     return crud.create_complaint(db=db, complaint=complaint)
