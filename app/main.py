@@ -21,7 +21,7 @@ def get_db():
         db.close()
 
 
-@app.get("/")
+@app.get("/api")
 def read_root(db: Session = Depends(get_db)):
     file = open('/code/app/insert.txt', 'r')
     query = file.read()
