@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class TYPE(Enum):
+class CLASSNAME(Enum):
     BANNER = 'banner'
     CRACK = 'crack'
     PORTHOLE = 'porthole'

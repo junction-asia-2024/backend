@@ -12,7 +12,7 @@ class Complaint(Base):
     location = Column(String(500))
     latitude = Column(Float)
     longitude = Column(Float)
-    type = Column(String(10))
+    classname = Column(String(10))
     phone = Column(String(11))
     image_link = Column(String(255))
     status = Column(String(10))

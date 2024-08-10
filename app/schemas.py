@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 import datetime
 
-from app.enums import TYPE, STATUS
+from app.enums import CLASSNAME, STATUS
 
 
 # class ComplaintBase(BaseModel):
 #     location: str
-#     type: TYPE
+#     classname: CLASSNAME
 #     phone: str
 #     image_link: str
 #     status: STATUS
@@ -15,7 +15,7 @@ from app.enums import TYPE, STATUS
 #
 # class ComplaintCreate(ComplaintBase):
 #     location: str
-#     type: TYPE
+#     classname: CLASSNAME
 #     phone: str
 #     image_link: str
 #     status: STATUS
@@ -24,7 +24,7 @@ class ComplaintCreate(BaseModel):
     location: str
     latitude: float
     longitude: float
-    type: TYPE
+    classname: CLASSNAME
     phone: str
     image_link: str
     status: STATUS
