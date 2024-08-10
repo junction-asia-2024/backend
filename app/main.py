@@ -21,20 +21,12 @@ def get_db():
         db.close()
 
 
-# @app.on_event("startup")
-# def startup_event():
-#     # Path to the SQL file
-#     sql_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '/app', 'insert.text'))
-
-#     # Name of the table to check
-#     table_name = "complaints"
-
-#     # Execute the SQL commands from the file if the table is empty
-#     execute_sql_file_if_empty(sql_file_path, table_name)
-
-
 @app.get("/")
-def read_root():
+def read_root(db: Session = Depends(get_db)):
+    file = open('/code/app/insert.txt', 'r')
+    query = file.read()
+    db.execute(text(query))
+    db.commit()
     return {"Hello": "World"}
 
 
