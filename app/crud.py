@@ -84,7 +84,7 @@ def get_nearby_problem(latitude: float, longitude: float, db: Session):
     # 반경 5미터 이내의 complaint 데이터를 조회
     nearby_problem = (
         db.query(models.DetectImage)
-        .filter(func.ST_DWithin(models.DetectImage.geom, point, 5.0 / 1000))  # 5미터 = 0.005 킬로미터
+        .limit(7)
         .all()
     )
 
