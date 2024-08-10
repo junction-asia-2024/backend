@@ -57,7 +57,7 @@ def get_nearby_complaint(db: Session):
             latitude=result.latitude,
             time=result.time,
             address=result.address,
-            image_url=f"https://d1m84t8yekat2i.cloudfront.net/00000{result.id}"
+            file_url=f"https://d1m84t8yekat2i.cloudfront.net/00000{result.id}"
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
@@ -148,7 +148,7 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
     ]
 
     return formatted_result
-    
+
 class NearByComplaintResponse():
     def __init__(self, id, longitude, latitude, time, address, file_name):
         self.id = id
