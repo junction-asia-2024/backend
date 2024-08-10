@@ -8,6 +8,7 @@ bucket_region = os.getenv('BUCKET_REGION')
 bucket_access_key = os.getenv('BUCKET_ACCESS_KEY')
 bucket_secret_key = os.getenv('BUCKET_SECRET_KEY')
 bucket_name = os.getenv('BUCKET_NAME')
+bucket_url_prefix = os.getenv('BUCKET_URL_PREFIX')
 
 # TODO: singleton으로 수정, presigned URL 사용 여부 논의
 def s3_connection():

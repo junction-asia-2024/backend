@@ -7,6 +7,8 @@ from . import models, schemas
 from .enums import CLASSNAME
 from datetime import date, datetime, timedelta
 
+from . import s3_bucket
+
 
 def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
     complaint = models.Complaint(
@@ -57,7 +59,7 @@ def get_nearby_complaint(db: Session):
             latitude=result.latitude,
             time=result.time,
             address=result.address,
-            file_url=f"https://d1m84t8yekat2i.cloudfront.net/pre-images/00000{result.id}"
+            file_url=f"{s3_bucket.bucket_url_prefix}/pre-images/00000{result.id}"
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
