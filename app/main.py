@@ -1,7 +1,6 @@
 import os
 import aiohttp
 from datetime import datetime, date
-import requests
 from fastapi import Depends, FastAPI, UploadFile, Form, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -160,7 +159,7 @@ async def upload_picture(file: UploadFile):
 async def get_location(address: str):
     url = f"http://dapi.kakao.com/v2/local/search/address.json?query={address}"
     headers = {
-        "Authorization": "KakaoAK 12ffa2474249e7d4ede60f132d69c4ab",
+        "Authorization": f"KakaoAK {os.getenv('KAKAO_REST_API_KEY')}",
     }
 
     async with aiohttp.ClientSession() as session:
