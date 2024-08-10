@@ -1,0 +1,67 @@
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build_and_push:
+    name: Push docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          ecr: auto
+          logout: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Extract metadata (labels, tags, etc.) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./app/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [ build_and_push ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+#      - name: copy file via ssh key
+#        uses: appleboy/scp-action@v0.1.4
+#        with:
+#          host: ${{ secrets.BASTION_HOST }}
+#          username: ${{ secrets.USERNAME }}
+#          key: ${{ secrets.KEY }}
+#          source: "docker-compose.yml"
+#          target: .
+#          script: |
+#            scp -i ${{ secrets.PEM_PATH }} /home/ubuntu/docker-compose.yml ubuntu@${{ secrets.PRIVATE_EC2_IP }}:/path/on/private/ec2
+
+      - name: run docker-compose
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.BASTION_HOST }}
+          username: ${{ secrets.BASTION_USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            ssh -i ${{ secrets.PEM_PATH }} ubuntu@${{ secrets.PRIVATE_EC2_IP }} << 'EOF'
+              sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+              sudo docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}
+              sudo docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
+            EOF
+#              docker stop $(docker ps -a -q)
+#              docker rm $(docker ps -a -q)
+#              docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
+#              docker run -d <container_name> <docker_hub_username>/<docker_image_name>
