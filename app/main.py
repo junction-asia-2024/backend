@@ -10,6 +10,8 @@ from .database import SessionLocal, engine
 from . import s3_bucket
 from .enums import CLASSNAME
 
+from typing_extensions import Annotated
+
 models.Base.metadata.create_all(bind=engine)
 
 # app = FastAPI()
@@ -50,7 +52,6 @@ def read_root():
 
 
 # 민원 등록
-# username: Annotated[str, Form()], password: Annotated[str, Form()]
 @app.post("/api/complaints")
 async def create_complaint(file: Annotated[UploadFile, Form()], complaint: Annotated[schemas.ComplaintCreate, Form()], db: Session = Depends(get_db)):
     s3_bucket.s3.put_object(
