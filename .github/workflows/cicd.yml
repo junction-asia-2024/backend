@@ -27,7 +27,7 @@ jobs:
           context: .
           file: ./app/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
+          tags: ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
           labels: ${{ steps.meta.outputs.labels }}
 
   deploy:
@@ -59,7 +59,7 @@ jobs:
             ssh -i ${{ secrets.PEM_PATH }} ubuntu@${{ secrets.PRIVATE_EC2_IP }} << 'EOF'
               sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
               sudo docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}
-              sudo docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
+              sudo docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
             EOF
 #              docker stop $(docker ps -a -q)
 #              docker rm $(docker ps -a -q)
