@@ -36,7 +36,7 @@ class ComplaintCreate(BaseModel):
 
 class ComplaintGet(ComplaintCreate):
     id: int  # ID 필드를 추가합니다.
-    created_at: datetime.date
+    created_at: datetime.datetime
 
     class Config:
         orm_mode = True
