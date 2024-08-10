@@ -25,7 +25,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: .
           push: true
           tags: ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
           labels: ${{ steps.meta.outputs.labels }}
@@ -38,17 +37,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-#      - name: copy file via ssh key
-#        uses: appleboy/scp-action@v0.1.4
-#        with:
-#          host: ${{ secrets.BASTION_HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.KEY }}
-#          source: "docker-compose.yml"
-#          target: .
-#          script: |
-#            scp -i ${{ secrets.PEM_PATH }} /home/ubuntu/docker-compose.yml ubuntu@${{ secrets.PRIVATE_EC2_IP }}:/path/on/private/ec2
-
       - name: run docker-compose
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -57,11 +45,9 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             ssh -i ${{ secrets.PEM_PATH }} ubuntu@${{ secrets.PRIVATE_EC2_IP }} << 'EOF'
-              sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-              sudo docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}
-              sudo docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
+              sudo -s
+              docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+              docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}
+              docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
+              docker image prune -f
             EOF
-#              docker stop $(docker ps -a -q)
-#              docker rm $(docker ps -a -q)
-#              docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REGISTRY_URL }}:latest
-#              docker run -d <container_name> <docker_hub_username>/<docker_image_name>
