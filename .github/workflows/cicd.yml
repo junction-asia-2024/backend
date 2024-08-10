@@ -52,7 +52,7 @@ jobs:
             ssh -i ${{ secrets.PEM_PATH }} ubuntu@${{ secrets.PRIVATE_EC2_IP }} << 'EOF'
               sudo -s
               docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-              docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}
+              docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
               docker run -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
               docker image prune -f
             EOF
