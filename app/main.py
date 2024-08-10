@@ -53,13 +53,35 @@ def read_root():
 
 # 민원 등록
 @app.post("/api/complaints/image")
-async def create_complaint(file: Annotated[UploadFile, Form()], complaint: Annotated[schemas.ComplaintCreate, Form()], db: Session = Depends(get_db)):
+async def create_complaint(
+    complaint: Annotated[schemas.ComplaintCreate, Form()],
+    file: Annotated[UploadFile, Form()], 
+    location: Annotated[str, Form()],
+    latitude: Annotated[str, Form()],
+    longitude: Annotated[str, Form()],
+    classname: Annotated[str, Form()],
+    phone: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    db: Session = Depends(get_db)
+):
     s3_bucket.s3.put_object(
         Body=await file.read(),
         Bucket=f'{s3_bucket.bucket_name}',
         Key=f'{file.filename}',
         ContentType='image/jpeg'
     )
+
+    complaint = schemas.ComplaintCreate(
+        location=location,
+        latitude=latitude,
+        longitude=longitude,
+        classname=classname,
+        phone=phone,
+        image_link=f"https://d1m84t8yekat2i.cloudfront.net/{file.filename}"
+        status=status,
+        description=description
+    )
+    
     return crud.create_complaint(db=db, complaint=complaint)
 
 
