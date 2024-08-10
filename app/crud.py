@@ -16,10 +16,10 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
         latitude=complaint.latitude,
         longitude=complaint.longitude,
         classname=complaint.classname.value,
-        phone=None
+        phone=None,
         image_link=complaint.image_link,
         status=complaint.status.value,
-        description=None
+        description=None,
         created_at=date.today()
     )
     db.add(complaint)
