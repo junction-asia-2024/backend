@@ -57,7 +57,7 @@ def get_nearby_complaint(db: Session):
             latitude=result.latitude,
             time=result.time,
             address=result.address,
-            file_url=f"https://d1m84t8yekat2i.cloudfront.net/00000{result.id}"
+            file_url=f"https://d1m84t8yekat2i.cloudfront.net/pre-images/00000{result.id}"
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
