@@ -52,7 +52,7 @@ def read_root():
 
 
 # 민원 등록
-@app.post("/api/complaints/1")
+@app.post("/api/complaints/image")
 async def create_complaint(file: Annotated[UploadFile, Form()], complaint: Annotated[schemas.ComplaintCreate, Form()], db: Session = Depends(get_db)):
     s3_bucket.s3.put_object(
         Body=await file.read(),
