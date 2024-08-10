@@ -54,7 +54,6 @@ def read_root():
 # 민원 등록
 @app.post("/api/complaints/image")
 async def create_complaint(
-    complaint: Annotated[schemas.ComplaintCreate, Form()],
     file: Annotated[UploadFile, Form()], 
     location: Annotated[str, Form()],
     latitude: Annotated[str, Form()],
