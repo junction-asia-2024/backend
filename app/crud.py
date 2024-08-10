@@ -156,4 +156,4 @@ class NearByComplaintResponse():
         self.latitude: latitude
         self.time = time
         self.address = address
-        self.file_url = file_name
+        self.file_url = file_url
