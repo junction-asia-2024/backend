@@ -77,8 +77,8 @@ async def create_complaint(
         longitude=longitude,
         classname=classname,
         phone=phone,
-        image_link=f"https://d1m84t8yekat2i.cloudfront.net/{file.filename}"
-        status="W"
+        image_link=f"https://d1m84t8yekat2i.cloudfront.net/{file.filename}",
+        status="W",
         description=description
     )
     
