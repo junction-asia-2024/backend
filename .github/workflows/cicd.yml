@@ -12,7 +12,12 @@ jobs:
       - name: Touch .env
         run: |
           touch ./.env
-          echo ${{ secrets.ENV }} >> ./.env
+          echo ${{ secrets.BUCKET_NAME }} >> ./.env
+          echo ${{ secrets.BUCKET_ACCESS_KEY }} >> ./.env
+          echo ${{ secrets.BUCKET_SECRET_KEY }} >> ./.env
+          echo ${{ secrets.BUCKET_REGION }} >> ./.env
+          echo ${{ secrets.BUCKET_URL_PREFIX }} >> ./.env
+          echo ${{ secrets.DATABASE_URL }} >> ./.env
         shell: bash
 
       - name: Build and Push to Docker Hub
