@@ -1,6 +1,8 @@
+import os
+import aiohttp
 from datetime import datetime, date
-
-from fastapi import Depends, FastAPI, UploadFile, Form
+import requests
+from fastapi import Depends, FastAPI, UploadFile, Form, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -56,14 +58,14 @@ def read_root():
 # 민원 등록
 @app.post("/api/complaints/image")
 async def create_complaint(
-    file: Annotated[UploadFile, Form()], 
-    location: Annotated[str, Form()],
-    latitude: Annotated[str, Form()],
-    longitude: Annotated[str, Form()],
-    classname: Annotated[str, Form()],
-    phone: Annotated[str, Form()],
-    description: Annotated[str, Form()],
-    db: Session = Depends(get_db)
+        file: Annotated[UploadFile, Form()],
+        location: Annotated[str, Form()],
+        latitude: Annotated[str, Form()],
+        longitude: Annotated[str, Form()],
+        classname: Annotated[str, Form()],
+        phone: Annotated[str, Form()],
+        description: Annotated[str, Form()],
+        db: Session = Depends(get_db)
 ):
     s3_bucket.s3.put_object(
         Body=await file.read(),
@@ -82,7 +84,7 @@ async def create_complaint(
         status="W",
         description=description
     )
-    
+
     return crud.create_complaint(db=db, complaint=complaint)
 
 
@@ -154,6 +156,27 @@ async def upload_picture(file: UploadFile):
     )
 
 
-@app.get("/api/gpt")
+@app.get("/api/location")
+async def get_location(address: str):
+    url = f"http://dapi.kakao.com/v2/local/search/address.json?query={address}"
+    headers = {
+        "Authorization": "KakaoAK 12ffa2474249e7d4ede60f132d69c4ab",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status != 200:
+                raise HTTPException(status_code=response.status, detail="Failed to fetch data from Kakao API")
+
+            data = await response.json()  # await 추가
+            if not data['documents']:
+                raise HTTPException(status_code=404, detail="Address not found")
+
+            location = data['documents'][0]['address']
+            lat = location['y']
+            lng = location['x']
+
+    return {"lat": lat, "lng": lng}
+
 def get_gpt():
     return gpt_start()
