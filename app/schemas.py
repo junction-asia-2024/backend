@@ -22,8 +22,8 @@ from app.enums import CLASSNAME, STATUS
 #     created_at: datetime.date
 class ComplaintCreate(BaseModel):
     location: str
-    latitude: float
-    longitude: float
+    latitude: str
+    longitude: str
     classname: CLASSNAME
     phone: str
     image_link: str
@@ -31,7 +31,7 @@ class ComplaintCreate(BaseModel):
     description: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ComplaintGet(ComplaintCreate):
@@ -39,4 +39,15 @@ class ComplaintGet(ComplaintCreate):
     created_at: datetime.datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class NearByComplaint(BaseModel):
+    id: int
+    longitude: str
+    latitude: str
+    time: datetime.datetime
+    address: str
+    file_name: str
+
+    class Config:
+        from_attributes = True

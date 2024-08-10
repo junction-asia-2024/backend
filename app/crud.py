@@ -46,3 +46,16 @@ def delete_complaint(complaint_id: int, db: Session):
     db.delete(complaint)
     db.commit()
     return complaint
+
+def get_nearby_complaint(db: Session):
+    return [
+        schemas.NearByComplaint(
+            id=result.id,
+            longitude=result.longitude,
+            latitude=result.latitude,
+            time=result.time,
+            address=result.address,
+            image_url=f"https://d1m84t8yekat2i.cloudfront.net/00000{result.id}"
+        )
+        for result in db.query(models.DetectImage).limit(10).all()
+    ]
