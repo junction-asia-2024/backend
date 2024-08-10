@@ -25,7 +25,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./app/Dockerfile
+          file: .
           push: true
           tags: ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
           labels: ${{ steps.meta.outputs.labels }}
