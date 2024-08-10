@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI, UploadFile, File
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
-from .database import SessionLocal, engine, execute_sql_file_if_empty
+from .database import SessionLocal, engine
 import os
 from . import s3_bucket
 from .enums import CLASSNAME
