@@ -114,7 +114,7 @@ async def upload_picture(file: UploadFile):
 
     return { image_url: f"{s3_bucket.bucket_url_prefix}{file.filename}" }
 
-@app.update("/api/complaints/{complaint_id}")
+@app.post("/api/complaints/add/{complaint_id}")
 def update_description(complaint_id: int, data: schemas.OptionalDescription, db: Session = Depends(get_db)):
     return crud.update_complaints(db, complaint_id, data)
 
