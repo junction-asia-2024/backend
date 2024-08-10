@@ -1,6 +1,6 @@
 from sqlite3 import Timestamp
 from datetime import date
-from sqlalchemy import Column, Integer, String, Date, Float
+from sqlalchemy import Column, Integer, String, Date, Float, DateTime
 
 from . import schemas
 from .database import Base
@@ -17,4 +17,4 @@ class Complaint(Base):
     image_link = Column(String(255))
     status = Column(String(10))
     description = Column(String(255))
-    created_at = Column(Date, default=date.today)
+    created_at = Column(DateTime)
