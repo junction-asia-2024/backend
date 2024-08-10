@@ -150,10 +150,10 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
     return formatted_result
 
 class NearByComplaintResponse():
-    def __init__(self, id, longitude, latitude, time, address, file_name):
+    def __init__(self, id, longitude, latitude, time, address, file_url):
         self.id = id
         self.longitude = longitude
         self.latitude: latitude
         self.time = time
         self.address = address
-        self.file_name = file_name
+        self.file_url = file_name
