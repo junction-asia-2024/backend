@@ -1,8 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:junctionkoa123!@junction-postgres.cty2i28gepdo.ap-northeast-2.rds.amazonaws.com:5432/koa"
+load_dotenv()
+
+database_url = os.getenv('DATABASE_URL')
+
+SQLALCHEMY_DATABASE_URL = database_url
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
