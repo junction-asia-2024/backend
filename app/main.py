@@ -54,7 +54,7 @@ def read_root():
 
 
 # 민원 등록
-@app.post("/api/complaints/image")
+@app.post("/api/complaints")
 def create_complaint(
     file: Annotated[str, Form()], 
     location: Annotated[str, Form()],
@@ -121,8 +121,6 @@ def update_description(complaint_id: int, data: schemas.OptionalDescription, db:
 """
     내 주변에 있는 문제들을 불러옵니다.
 """
-
-
 @app.get("/api/detects")
 def get_nearby_problem(latitude: float, longitude: float, db: Session = Depends(get_db)):
     return crud.get_nearby_problem(latitude, longitude, db)
@@ -141,17 +139,6 @@ def get_pie_chart(start_date: datetime, end_date: datetime, db: Session = Depend
 @app.get("/api/chart/stick")
 def get_stick_chart(start_date: datetime, end_date: datetime, db: Session = Depends(get_db), ):
     return crud.get_stick_chart(db, start_date=start_date, end_date=end_date)
-
-
-@app.post("/api/users/pictures")
-async def upload_picture(file: UploadFile):
-    s3_bucket.s3.put_object(
-        Body=await file.read(),
-        Bucket=f'{s3_bucket.bucket_name}',
-        Key=f'{file.filename}',
-        ContentType='image/jpeg'
-    )
-
 
 @app.get("/api/gpt")
 def get_gpt():
