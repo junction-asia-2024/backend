@@ -58,3 +58,4 @@ websockets==12.0
 Werkzeug==3.0.3
 boto3
 cryptography
+psycopg2
