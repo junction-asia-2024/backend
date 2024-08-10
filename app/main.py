@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from fastapi import Depends, FastAPI, UploadFile
+from fastapi import Depends, FastAPI, UploadFile, Form
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -50,8 +50,15 @@ def read_root():
 
 
 # 민원 등록
+# username: Annotated[str, Form()], password: Annotated[str, Form()]
 @app.post("/api/complaints")
-def create_complaint(complaint: schemas.ComplaintCreate, db: Session = Depends(get_db)):
+async def create_complaint(file: Annotated[UploadFile, Form()], complaint: Annotated[schemas.ComplaintCreate, Form()], db: Session = Depends(get_db)):
+    s3_bucket.s3.put_object(
+        Body=await file.read(),
+        Bucket=f'{s3_bucket.bucket_name}',
+        Key=f'{file.filename}',
+        ContentType='image/jpeg'
+    )
     return crud.create_complaint(db=db, complaint=complaint)
 
 
@@ -79,7 +86,7 @@ def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
     return crud.delete_complaint(complaint_id, db)
 
 
-# @app.post("/api/users/pictures")
+# @app.post("/api/complaints")
 # async def upload_picture(file: UploadFile):
 #     s3_bucket.s3.put_object(
 #         Body=await file.read(),
