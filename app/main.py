@@ -3,6 +3,8 @@ from datetime import datetime, date
 from fastapi import Depends, FastAPI, UploadFile
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
+
 from . import crud, models, schemas
 from .database import SessionLocal, engine
 from . import s3_bucket
@@ -13,6 +15,17 @@ models.Base.metadata.create_all(bind=engine)
 # app = FastAPI()
 app = FastAPI(docs_url='/api/docs', openapi_url='/api/openapi.json')
 
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency
 def get_db():
@@ -66,14 +79,14 @@ def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
     return crud.delete_complaint(complaint_id, db)
 
 
-@app.post("/api/users/pictures")
-async def upload_picture(file: UploadFile):
-    s3_bucket.s3.put_object(
-        Body=await file.read(),
-        Bucket=f'{s3_bucket.bucket_name}',
-        Key=f'{file.filename}',
-        ContentType='image/jpeg'
-    )
+# @app.post("/api/users/pictures")
+# async def upload_picture(file: UploadFile):
+#     s3_bucket.s3.put_object(
+#         Body=await file.read(),
+#         Bucket=f'{s3_bucket.bucket_name}',
+#         Key=f'{file.filename}',
+#         ContentType='image/jpeg'
+#     )
 
 """
     내 주변에 있는 문제들을 불러옵니다.
