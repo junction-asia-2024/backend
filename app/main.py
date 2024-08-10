@@ -9,6 +9,7 @@ from . import crud, models, schemas
 from .database import SessionLocal, engine
 from . import s3_bucket
 from .enums import CLASSNAME
+from .gpt import gpt_start
 
 from typing_extensions import Annotated
 
@@ -28,6 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Dependency
 def get_db():
@@ -120,9 +122,12 @@ def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
 """
     내 주변에 있는 문제들을 불러옵니다.
 """
+
+
 @app.get("/api/detects")
-def get_nearby_complaint(db: Session = Depends(get_db)):
-    return crud.get_nearby_complaint(db)
+def get_nearby_problem(latitude: float, longitude: float, db: Session = Depends(get_db)):
+    return crud.get_nearby_problem(latitude, longitude, db)
+
 
 @app.get("/api/chart/linear")
 def get_linear_chart(db: Session = Depends(get_db), ):
@@ -147,3 +152,8 @@ async def upload_picture(file: UploadFile):
         Key=f'{file.filename}',
         ContentType='image/jpeg'
     )
+
+
+@app.get("/api/gpt")
+def get_gpt():
+    return gpt_start()

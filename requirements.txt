@@ -59,3 +59,12 @@ Werkzeug==3.0.3
 boto3
 cryptography
 psycopg2
+Geometry
+geoalchemy2
+pandas
+matplotlib
+seaborn
+numpy
+openai==0.28
+aiofiles
+python-dotenv

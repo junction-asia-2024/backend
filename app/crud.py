@@ -2,7 +2,7 @@ import math
 
 from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Session
-
+from geoalchemy2 import WKTElement
 from . import models, schemas
 from .enums import CLASSNAME
 from datetime import date, datetime, timedelta
@@ -51,6 +51,7 @@ def delete_complaint(complaint_id: int, db: Session):
     db.commit()
     return complaint
 
+
 def get_nearby_complaint(db: Session):
     return [
         NearByComplaintResponse(
@@ -63,6 +64,32 @@ def get_nearby_complaint(db: Session):
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
+
+
+def get_nearby_problem(latitude: float, longitude: float, db: Session):
+    # return [
+    #     NearByComplaintResponse(
+    #         id=result.id,
+    #         longitude=result.longitude,
+    #         latitude=result.latitude,
+    #         time=result.time,
+    #         address=result.address,
+    #         file_url=f"https://d1m84t8yekat2i.cloudfront.net/pre-images/00000{result.id}"
+    #     )
+    #     for result in db.query(models.DetectImage).limit(10).all()
+    # ]
+
+    point = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
+
+    # 반경 5미터 이내의 complaint 데이터를 조회
+    nearby_problem = (
+        db.query(models.DetectImage)
+        .filter(func.ST_DWithin(models.DetectImage.geom, point, 5.0 / 1000))  # 5미터 = 0.005 킬로미터
+        .all()
+    )
+
+    return nearby_problem
+
 
 def get_linear_chart(db: Session):
     now = datetime.now()
@@ -150,6 +177,7 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
     ]
 
     return formatted_result
+
 
 class NearByComplaintResponse():
     def __init__(self, id, longitude, latitude, time, address, file_url):
