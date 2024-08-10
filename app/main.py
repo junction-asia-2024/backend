@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI, UploadFile, File
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -25,7 +26,7 @@ def get_db():
 def read_root(db: Session = Depends(get_db)):
     file = open('/code/app/insert.txt', 'r')
     query = file.read()
-    db.execute(Text(query))
+    db.execute(text(query))
     db.commit()
     return {"Hello": "World"}
 
