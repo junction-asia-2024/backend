@@ -13,6 +13,7 @@ jobs:
         env:
           APPLICATION: ${{ secrets.ENV }}
         run: |
+          cd ./app
           echo $APPLICATION >> ./.env
 
       - name: Build and Push to Docker Hub
