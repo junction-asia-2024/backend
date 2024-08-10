@@ -34,7 +34,7 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
 
 
 def get_complaints(type: TYPE, db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Complaint).filter(models.Complaint.type == type).offset(skip).limit(limit).all()
+    return db.query(models.Complaint).filter(models.Complaint.type == type.value).offset(skip).limit(limit).all()
 
 
 def get_complaint(complaint_id: int, db: Session):
