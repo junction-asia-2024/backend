@@ -9,10 +9,11 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Write .env file
+      - name: Touch .env
+        env:
+          APPLICATION: ${{ secrets.ENV }}
         run: |
-          touch ./.env
-          echo "${{ secrets.ENV }}" >> ./.env
+          echo $APPLICATION >> ./.env
 
       - name: Build and Push to Docker Hub
         run: |
