@@ -51,7 +51,7 @@ def delete_complaint(complaint_id: int, db: Session):
 
 def get_nearby_complaint(db: Session):
     return [
-        schemas.NearByComplaint(
+        NearByComplaintResponse(
             id=result.id,
             longitude=result.longitude,
             latitude=result.latitude,
@@ -148,3 +148,12 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
     ]
 
     return formatted_result
+    
+class NearByComplaintResponse():
+    def __init__(self, id, longitude, latitude, time, address, file_name):
+        self.id = id
+        self.longitude = longitude
+        self.latitude: latitude
+        self.time = time
+        self.address = address
+        self.file_name = file_name

@@ -47,7 +47,6 @@ class NearByComplaint(BaseModel):
     latitude: str
     time: datetime.datetime
     address: str
-    file_name: str
 
     class Config:
         from_attributes = True
