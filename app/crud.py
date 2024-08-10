@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from . import models, schemas
+from .enums import TYPE
 from .utils import Hasher
 from datetime import date
 
@@ -32,8 +33,8 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
     return complaint
 
 
-def get_complaints(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Complaint).offset(skip).limit(limit).all()
+def get_complaints(type: TYPE, db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Complaint).filter(models.Complaint.type == type).offset(skip).limit(limit).all()
 
 
 def get_complaint(complaint_id: int, db: Session):

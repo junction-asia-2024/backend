@@ -5,6 +5,7 @@ from . import crud, models, schemas
 from .database import SessionLocal, engine
 
 from . import s3_bucket
+from .enums import TYPE
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -33,8 +34,8 @@ def create_complaint(complaint: schemas.ComplaintCreate, db: Session = Depends(g
 
 # 민원 목록 조회
 @app.get("/api/complaints", response_model=list[schemas.ComplaintGet])
-def get_complaints(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    return crud.get_complaints(db, skip=skip, limit=limit)
+def get_complaints(type: TYPE, db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
+    return crud.get_complaints(type, db, skip=skip, limit=limit)
 
 
 # 민원 단건 조회
