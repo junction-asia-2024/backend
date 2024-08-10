@@ -29,7 +29,8 @@ jobs:
           script: |
             ssh -i ${{ secrets.PEM_PATH }} ubuntu@${{ secrets.PRIVATE_EC2_IP }} << 'EOF'
               sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+              sudo docker stop backend
               sudo docker pull ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
-              sudo docker run -d -p 8000:8000 ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
+              sudo docker run -d -p 8000:8000 --rm --name backend ${{ secrets.DOCKERHUB_REGISTRY_URL }}:backend
               sudo docker image prune -f
             EOF
