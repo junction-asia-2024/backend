@@ -1,17 +1,11 @@
+import math
+
+from sqlalchemy import DateTime, func
 from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .enums import CLASSNAME
-from .utils import Hasher
-from datetime import date
-
-
-# def get_user(db: Session, email: str):
-#     return db.query(models.User).filter(models.User.email == email).first()
-#
-#
-# def get_user_by_email(db: Session, email: str):
-#     return db.query(models.User).filter(models.User.email == email).first()
+from datetime import date, datetime, timedelta
 
 
 def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
@@ -34,7 +28,15 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
 
 
 def get_complaints(classname: CLASSNAME, db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Complaint).filter(models.Complaint.classname == classname.value).offset(skip).limit(limit).all()
+    limit__all = db.query(models.Complaint).filter(models.Complaint.classname == classname.value).offset(skip).limit(
+        limit).all()
+    return limit__all
+
+
+def get_complaints_by_phone(phone: str, db: Session, skip: int = 0, limit: int = 100):
+    limit__all = db.query(models.Complaint).filter(models.Complaint.phone == phone).offset(skip).limit(
+        limit).all()
+    return limit__all
 
 
 def get_complaint(complaint_id: int, db: Session):
@@ -59,3 +61,90 @@ def get_nearby_complaint(db: Session):
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
+
+def get_linear_chart(db: Session):
+    now = datetime.now()
+    # 오늘의 시작과 끝 시간을 계산
+    start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_today = start_of_today + timedelta(days=1)
+    result = (
+        db.query(
+            func.date_trunc('hour', models.Complaint.created_at).label('hour'),
+            func.count(models.Complaint.id).label('count')
+        )
+        .filter(models.Complaint.created_at >= start_of_today, models.Complaint.created_at < end_of_today)
+        .group_by('hour')
+        .order_by('hour')
+        .all()
+    )
+
+    formatted_result = [
+        {
+            "hour": hour.strftime('%H'),  # 'HH' 포맷으로 시간 출력
+            "count": count
+        }
+        for hour, count in result
+    ]
+
+    return formatted_result
+
+
+def get_pie_chart(db, start_date: datetime, end_date: datetime):
+    total_count = (
+        db.query(func.count(models.Complaint.id))
+        .filter(models.Complaint.created_at >= start_date, models.Complaint.created_at < end_date)
+        .scalar()
+    )
+
+    status_counts = (
+        db.query(
+            models.Complaint.status.label('status'),
+            func.count(models.Complaint.id).label('count')
+        )
+        .filter(models.Complaint.created_at >= start_date, models.Complaint.created_at < end_date)
+        .group_by(models.Complaint.status)
+        .order_by(models.Complaint.status)
+        .all()
+    )
+
+    percentages = [
+        {
+            "status": status,
+            "percentage": (count / total_count) * 100
+        }
+        for status, count in status_counts
+    ]
+
+    pie_chart_data = []
+    for status, count in status_counts:
+        percentage = (count / total_count * 100) if total_count > 0 else 0
+        pie_chart_data.append({
+            "status": status,
+            "count": count,
+            "percentage": math.floor(percentage * 10) / 10
+        })
+
+    return pie_chart_data
+
+
+def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
+    result = (
+        db.query(
+            func.date(models.Complaint.created_at).label('date'),
+            func.count(models.Complaint.id).label('count')
+        )
+        .filter(models.Complaint.created_at >= start_date, models.Complaint.created_at <= end_date)
+        .group_by(func.date(models.Complaint.created_at))
+        .order_by(func.date(models.Complaint.created_at))
+        .all()
+    )
+
+    formatted_result = [
+        {
+            "day": hour.strftime('%H'),  # 'HH' 포맷으로 시간 출력
+            "count": count
+        }
+        for hour, count in result
+    ]
+
+    return formatted_result
