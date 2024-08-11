@@ -4,7 +4,7 @@ from enum import Enum
 class CLASSNAME(Enum):
     BANNER = 'banner'
     CRACK = 'crack'
-    PORTHOLE = 'porthole'
+    PORTHOLE = 'pothole'
     VEHICLE = 'vehicle'
     TRASH = 'trash'
 
