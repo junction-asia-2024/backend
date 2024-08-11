@@ -1,6 +1,7 @@
+import os
+import aiohttp
 from datetime import datetime, date
-
-from fastapi import Depends, FastAPI, UploadFile, Form
+from fastapi import Depends, FastAPI, UploadFile, Form, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -54,6 +55,18 @@ def read_root():
 
 
 # 민원 등록
+@app.post("/api/complaints/image")
+async def create_complaint(
+        file: Annotated[UploadFile, Form()],
+        location: Annotated[str, Form()],
+        latitude: Annotated[str, Form()],
+        longitude: Annotated[str, Form()],
+        classname: Annotated[str, Form()],
+        phone: Annotated[str, Form()],
+        description: Annotated[str, Form()],
+        db: Session = Depends(get_db)
+
+  
 @app.post("/api/complaints")
 def create_complaint(
     file: Annotated[str, Form()], 
@@ -71,7 +84,7 @@ def create_complaint(
         image_link=file,
         status="W",
     )
-    
+
     return crud.create_complaint(db=db, complaint=complaint)
 
 
@@ -135,6 +148,40 @@ def get_pie_chart(start_date: datetime, end_date: datetime, db: Session = Depend
 @app.get("/api/chart/stick")
 def get_stick_chart(start_date: datetime, end_date: datetime, db: Session = Depends(get_db), ):
     return crud.get_stick_chart(db, start_date=start_date, end_date=end_date)
+
+
+@app.post("/api/users/pictures")
+async def upload_picture(file: UploadFile):
+    s3_bucket.s3.put_object(
+        Body=await file.read(),
+        Bucket=f'{s3_bucket.bucket_name}',
+        Key=f'{file.filename}',
+        ContentType='image/jpeg'
+    )
+
+
+@app.get("/api/location")
+async def get_location(address: str):
+    url = f"http://dapi.kakao.com/v2/local/search/address.json?query={address}"
+    headers = {
+        "Authorization": f"KakaoAK {os.getenv('KAKAO_REST_API_KEY')}",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status != 200:
+                raise HTTPException(status_code=response.status, detail="Failed to fetch data from Kakao API")
+
+            data = await response.json()  # await 추가
+            if not data['documents']:
+                raise HTTPException(status_code=404, detail="Address not found")
+
+            location = data['documents'][0]['address']
+            lat = location['y']
+            lng = location['x']
+
+    return {"lat": lat, "lng": lng}
+
 
 @app.get("/api/gpt")
 def get_gpt():
