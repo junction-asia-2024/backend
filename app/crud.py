@@ -16,10 +16,10 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
         latitude=complaint.latitude,
         longitude=complaint.longitude,
         classname=complaint.classname.value,
-        phone=complaint.phone,
+        phone=None,
         image_link=complaint.image_link,
         status=complaint.status.value,
-        description=complaint.description,
+        description=None,
         created_at=date.today()
     )
     db.add(complaint)
@@ -60,7 +60,7 @@ def get_nearby_complaint(db: Session):
             latitude=result.latitude,
             time=result.time,
             address=result.address,
-            file_url=f"{s3_bucket.bucket_url_prefix}/pre-images/00000{result.id}"
+            file_url=f"{s3_bucket.bucket_url_prefix}pre-images/00000{result.id}"
         )
         for result in db.query(models.DetectImage).limit(10).all()
     ]
@@ -84,7 +84,7 @@ def get_nearby_problem(latitude: float, longitude: float, db: Session):
     # 반경 5미터 이내의 complaint 데이터를 조회
     nearby_problem = (
         db.query(models.DetectImage)
-        .filter(func.ST_DWithin(models.DetectImage.geom, point, 5.0 / 1000))  # 5미터 = 0.005 킬로미터
+        .limit(7)
         .all()
     )
 
@@ -178,6 +178,15 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
 
     return formatted_result
 
+def update_complaints(db: Session, id: int, complaint: schemas.OptionalDescription):
+    result = get_complaint(id, db)
+
+    result.phone = complaint.phone
+    result.description = complaint.description
+
+    db.commit()
+    db.refresh(result)
+    return result
 
 class NearByComplaintResponse():
     def __init__(self, id, longitude, latitude, time, address, file_url):

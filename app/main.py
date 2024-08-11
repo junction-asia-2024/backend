@@ -65,23 +65,24 @@ async def create_complaint(
         phone: Annotated[str, Form()],
         description: Annotated[str, Form()],
         db: Session = Depends(get_db)
-):
-    s3_bucket.s3.put_object(
-        Body=await file.read(),
-        Bucket=f'{s3_bucket.bucket_name}',
-        Key=f'{file.filename}',
-        ContentType='image/jpeg'
-    )
 
+  
+@app.post("/api/complaints")
+def create_complaint(
+    file: Annotated[str, Form()], 
+    location: Annotated[str, Form()],
+    latitude: Annotated[str, Form()],
+    longitude: Annotated[str, Form()],
+    classname: Annotated[str, Form()],
+    db: Session = Depends(get_db)
+):
     complaint = schemas.ComplaintCreate(
         location=location,
         latitude=latitude,
         longitude=longitude,
         classname=classname,
-        phone=phone,
-        image_link=f"{s3_bucket.bucket_url_prefix}{file.filename}",
+        image_link=file,
         status="W",
-        description=description
     )
 
     return crud.create_complaint(db=db, complaint=complaint)
@@ -111,20 +112,24 @@ def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
     return crud.delete_complaint(complaint_id, db)
 
 
-# @app.post("/api/complaints")
-# async def upload_picture(file: UploadFile):
-#     s3_bucket.s3.put_object(
-#         Body=await file.read(),
-#         Bucket=f'{s3_bucket.bucket_name}',
-#         Key=f'{file.filename}',
-#         ContentType='image/jpeg'
-#     )
+@app.post("/api/complaints/files")
+async def upload_picture(file: UploadFile):
+    s3_bucket.s3.put_object(
+        Body=await file.read(),
+        Bucket=f'{s3_bucket.bucket_name}',
+        Key=f'{file.filename}',
+        ContentType='image/jpeg'
+    )
+
+    return { "image_url": f"{s3_bucket.bucket_url_prefix}{file.filename}" }
+
+@app.post("/api/complaints/add/{complaint_id}")
+def update_description(complaint_id: int, data: schemas.OptionalDescription, db: Session = Depends(get_db)):
+    return crud.update_complaints(db, complaint_id, data)
 
 """
     내 주변에 있는 문제들을 불러옵니다.
 """
-
-
 @app.get("/api/detects")
 def get_nearby_problem(latitude: float, longitude: float, db: Session = Depends(get_db)):
     return crud.get_nearby_problem(latitude, longitude, db)
@@ -177,5 +182,8 @@ async def get_location(address: str):
 
     return {"lat": lat, "lng": lng}
 
+
+@app.get("/api/gpt")
 def get_gpt():
     return gpt_start()
+    return crud.get_stick_chart(db, start_date=start_date, end_date=end_date)

@@ -26,12 +26,16 @@ jobs:
           echo "BUCKET_REGION=${{ secrets.BUCKET_REGION }}" >> ./.env
           echo "BUCKET_URL_PREFIX=${{ secrets.BUCKET_URL_PREFIX }}" >> ./.env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./.env
+          echo "API_KEY=${{ secrets.GPT_KEY }}" >> ./.env
+          echo "KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}" >> ./.env
           echo "BUCKET_NAME=${{ secrets.BUCKET_NAME }}" >> ./app/.env
           echo "BUCKET_ACCESS_KEY=${{ secrets.BUCKET_ACCESS_KEY }}" >> ./app/.env
           echo "BUCKET_SECRET_KEY=${{ secrets.BUCKET_SECRET_KEY }}" >> ./app/.env
           echo "BUCKET_REGION=${{ secrets.BUCKET_REGION }}" >> ./app/.env
           echo "BUCKET_URL_PREFIX=${{ secrets.BUCKET_URL_PREFIX }}" >> ./app/.env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> ./app/.env
+          echo "API_KEY=${{ secrets.GPT_KEY }}" >> ./app/.env
+          echo "KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}" >> ./app/.env
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
