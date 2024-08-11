@@ -52,21 +52,7 @@ def read_root(db: Session = Depends(get_db)):
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-
-# 민원 등록
-@app.post("/api/complaints/image")
-async def create_complaint(
-        file: Annotated[UploadFile, Form()],
-        location: Annotated[str, Form()],
-        latitude: Annotated[str, Form()],
-        longitude: Annotated[str, Form()],
-        classname: Annotated[str, Form()],
-        phone: Annotated[str, Form()],
-        description: Annotated[str, Form()],
-        db: Session = Depends(get_db)
-
-  
+ 
 @app.post("/api/complaints")
 def create_complaint(
     file: Annotated[str, Form()], 
