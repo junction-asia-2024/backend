@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # 데이터 로드
 load_dotenv()
 openai.api_key = os.getenv("API_KEY")
-data = pd.read_csv("/Users/yukeon/Desktop/backend/app/total_pohang.csv")
+data = pd.read_csv("/code/app/total_pohang.csv")
 
 
 def ranking_danger_combined() -> dict:
