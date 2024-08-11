@@ -79,7 +79,7 @@ def create_complaint(
 # 민원 목록 조회
 @app.get("/api/complaints")
 def get_complaints(classname: CLASSNAME, db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    return crud.get_complaints(classname, db, skip=skip, limit=limit)
+    return crud.get_complaints(classname.value, db, skip=skip, limit=limit)
 
 
 # 민원 목록 조회
