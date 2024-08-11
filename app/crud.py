@@ -37,7 +37,7 @@ def get_complaints(classname: str, db: Session, skip: int = 0, limit: int = 100)
             func.count(models.Complaint.id).label('count'),
             models.Complaint.status
         )
-        .filter(models.Complaint.classname == classname.value)
+        .filter(models.Complaint.classname == classname)
         .group_by(models.Complaint.classname, models.Complaint.location, models.Complaint.status)
         .offset(skip)
         .limit(limit)
