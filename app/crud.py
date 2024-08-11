@@ -43,8 +43,16 @@ def get_complaints(classname: str, db: Session, skip: int = 0, limit: int = 100)
         .limit(limit)
         .all()
     )
-
-    return grouped_results
+    results = [
+        {
+            "classname": result.classname,
+            "location": result.location,
+            "count": result.count,
+            "status": result.status
+        }
+        for result in grouped_results
+    ]
+    return results
 
 
 def get_complaints_detail(classname: CLASSNAME, location: str, db: Session, skip: int = 0, limit: int = 100):
