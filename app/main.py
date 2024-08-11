@@ -52,15 +52,16 @@ def read_root(db: Session = Depends(get_db)):
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
- 
+
+
 @app.post("/api/complaints")
 def create_complaint(
-    file: Annotated[str, Form()], 
-    location: Annotated[str, Form()],
-    latitude: Annotated[str, Form()],
-    longitude: Annotated[str, Form()],
-    classname: Annotated[str, Form()],
-    db: Session = Depends(get_db)
+        file: Annotated[str, Form()],
+        location: Annotated[str, Form()],
+        latitude: Annotated[str, Form()],
+        longitude: Annotated[str, Form()],
+        classname: Annotated[str, Form()],
+        db: Session = Depends(get_db)
 ):
     complaint = schemas.ComplaintCreate(
         location=location,
@@ -86,6 +87,12 @@ def get_complaints_by_phone(phone: str, db: Session = Depends(get_db), skip: int
     return crud.get_complaints_by_phone(phone, db, skip=skip, limit=limit)
 
 
+@app.get("/api/complaints/detail")
+def get_complaints_detail(classname: CLASSNAME, location: str, db: Session = Depends(get_db), skip: int = 0,
+                          limit: int = 100):
+    return crud.get_complaints_detail(classname, location, db, skip=skip, limit=limit)
+
+
 # 민원 단건 조회
 @app.get("/api/complaints/{complaint_id}")
 def get_complaints(complaint_id: int, db: Session = Depends(get_db)):
@@ -107,15 +114,19 @@ async def upload_picture(file: UploadFile):
         ContentType='image/jpeg'
     )
 
-    return { "image_url": f"{s3_bucket.bucket_url_prefix}{file.filename}" }
+    return {"image_url": f"{s3_bucket.bucket_url_prefix}{file.filename}"}
+
 
 @app.post("/api/complaints/add/{complaint_id}")
 def update_description(complaint_id: int, data: schemas.OptionalDescription, db: Session = Depends(get_db)):
     return crud.update_complaints(db, complaint_id, data)
 
+
 """
     내 주변에 있는 문제들을 불러옵니다.
 """
+
+
 @app.get("/api/detects")
 def get_nearby_problem(latitude: float, longitude: float, db: Session = Depends(get_db)):
     return crud.get_nearby_problem(latitude, longitude, db)

@@ -30,9 +30,35 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
 
 
 def get_complaints(classname: CLASSNAME, db: Session, skip: int = 0, limit: int = 100):
-    limit__all = db.query(models.Complaint).filter(models.Complaint.classname == classname.value).offset(skip).limit(
-        limit).all()
-    return limit__all
+    grouped_results = (
+        db.query(
+            models.Complaint.classname,
+            models.Complaint.location,
+            func.count(models.Complaint.id).label('count'),
+            models.Complaint.status
+        )
+        .filter(models.Complaint.classname == classname.value)
+        .group_by(models.Complaint.classname, models.Complaint.location, models.Complaint.status)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    return grouped_results
+
+
+def get_complaints_detail(classname: CLASSNAME, location: str, db: Session, skip: int = 0, limit: int = 100):
+    complaints = (
+        db.query(models.Complaint)
+        .filter(
+            models.Complaint.classname == classname.value,
+            models.Complaint.location == location
+        )
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return complaints
 
 
 def get_complaints_by_phone(phone: str, db: Session, skip: int = 0, limit: int = 100):
@@ -178,6 +204,7 @@ def get_stick_chart(db: Session, start_date: datetime, end_date: datetime):
 
     return formatted_result
 
+
 def update_complaints(db: Session, id: int, complaint: schemas.OptionalDescription):
     result = get_complaint(id, db)
 
@@ -187,6 +214,7 @@ def update_complaints(db: Session, id: int, complaint: schemas.OptionalDescripti
     db.commit()
     db.refresh(result)
     return result
+
 
 class NearByComplaintResponse():
     def __init__(self, id, longitude, latitude, time, address, file_url):
