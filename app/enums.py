@@ -2,11 +2,11 @@ from enum import Enum
 
 
 class CLASSNAME(Enum):
-    BANNER = 'banner'
-    CRACK = 'crack'
-    PORTHOLE = 'pothole'
-    VEHICLE = 'vehicle'
-    TRASH = 'trash'
+    banner = 'banner'
+    crack = 'crack'
+    pothole = 'pothole'
+    vehicle = 'vehicle'
+    trash = 'trash'
 
 
 class STATUS(Enum):
