@@ -21,6 +21,7 @@ app = FastAPI(docs_url='/api/docs', openapi_url='/api/openapi.json')
 
 origins = [
     "http://localhost:3000",
+    "http://minwon.site"
 ]
 
 app.add_middleware(
@@ -177,7 +178,9 @@ async def get_location(address: str):
             lat = location['y']
             lng = location['x']
 
-    return {"lat": lat, "lng": lng}
+            return {"lat": lat, "lng": lng}
+    
+    return {"lat": None, "lng": None}
 
 
 @app.get("/api/gpt")
