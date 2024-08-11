@@ -29,7 +29,7 @@ def create_complaint(db: Session, complaint: schemas.ComplaintCreate):
     return complaint
 
 
-def get_complaints(classname: str, db: Session, skip: int = 0, limit: int = 100):
+def get_complaints(classname: CLASSNAME, db: Session, skip: int = 0, limit: int = 100):
     grouped_results = (
         db.query(
             models.Complaint.classname,
@@ -37,8 +37,8 @@ def get_complaints(classname: str, db: Session, skip: int = 0, limit: int = 100)
             func.count(models.Complaint.id).label('count'),
             models.Complaint.status
         )
-        .filter(models.Complaint.classname == classname)
-        .group_by(models.Complaint.classname, models.Complaint.location, models.Complaint.status)
+        .filter(models.Complaint.classname == classname.value)
+        .group_by(models.Complaint.classname.value, models.Complaint.location, models.Complaint.status)
         .offset(skip)
         .limit(limit)
         .all()
